@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>车管家 · 运营后台</title>
+<style nonce="__ADMIN_CSP_NONCE__">
+  :root {
+    --bg: #0E1218;
+    --panel: #171D26;
+    --panel-2: #1F2732;
+    --line: #2A3542;
+    --text: #E8EDF4;
+    --muted: #8A97A8;
+    --accent: #FF6A2A;
+    --green: #2FBF8F;
+    --blue: #5B9BFF;
+    --gold: #D8B06A;
+    --red: #FF7A6B;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+  }
+  .hidden { display: none !important; }
+  .mono { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 12px; }
+  .muted { color: var(--muted); }
+  .sub { color: var(--muted); font-size: 12px; }
+
+  /* ---------- 登录 ---------- */
+  .login-wrap {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background:
+      radial-gradient(900px 500px at 20% 0%, rgba(255, 106, 42, .16), transparent 60%),
+      radial-gradient(700px 500px at 90% 100%, rgba(91, 155, 255, .12), transparent 60%);
+  }
+  .login-card {
+    width: 100%;
+    max-width: 400px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 30px 28px;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, .45);
+  }
+  .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; }
+  .logo {
+    width: 42px; height: 42px; border-radius: 13px;
+    background: linear-gradient(135deg, #FF8A4C, #FF4E1E);
+    display: grid; place-items: center; font-size: 21px;
+  }
+  .brand h1 { margin: 0; font-size: 17px; letter-spacing: .5px; }
+  .brand .sub { font-size: 12px; }
+  .field { display: block; margin-bottom: 14px; }
+  .field > span { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  input, select, textarea {
+    width: 100%;
+    background: var(--panel-2);
+    color: var(--text);
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    padding: 9px 12px;
+    font: inherit;
+    font-size: 13px;
+    outline: none;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+  textarea { resize: vertical; min-height: 76px; }
+  button {
+    background: var(--accent);
+    color: #fff;
+    border: 0;
+    border-radius: 9px;
+    padding: 9px 16px;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button:disabled { opacity: .45; cursor: not-allowed; }
+  button.ghost { background: var(--panel-2); color: var(--text); border: 1px solid var(--line); font-weight: 400; }
+  button.danger { background: rgba(255, 122, 107, .14); color: var(--red); border: 1px solid rgba(255, 122, 107, .35); font-weight: 500; }
+  button.mini { padding: 3px 10px; font-size: 12px; border-radius: 7px; }
+  button:hover:not(:disabled) { filter: brightness(1.08); }
+  .login-error { color: var(--red); font-size: 13px; min-height: 22px; margin-top: 10px; }
+  .login-hint { color: var(--muted); font-size: 12px; margin-top: 14px; line-height: 1.7; }
+
+  /* ---------- 布局 ---------- */
+  .shell { display: flex; flex-direction: column; min-height: 100vh; }
+  header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--line);
+    background: linear-gradient(180deg, #161C25, #121821);
+    position: sticky; top: 0; z-index: 10;
+  }
+  header h1 { margin: 0; font-size: 16px; letter-spacing: .5px; }
+  header .spacer { flex: 1; }
+  .who { text-align: right; line-height: 1.35; }
+  .who b { font-size: 13px; }
+  .role-chip {
+    display: inline-block; padding: 1px 9px; border-radius: 999px;
+    background: rgba(216, 176, 106, .14); color: var(--gold); font-size: 11px;
+  }
+  .layout { display: flex; flex: 1; min-height: 0; }
+  nav.side {
+    width: 176px;
+    flex: 0 0 176px;
+    border-right: 1px solid var(--line);
+    padding: 18px 12px;
+    background: #121821;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 9px;
+    width: 100%;
+    padding: 9px 12px;
+    margin-bottom: 4px;
+    border-radius: 9px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--muted);
+    font-weight: 500;
+    text-align: left;
+  }
+  .nav-item.on { background: rgba(255, 106, 42, .13); color: var(--accent); border-color: rgba(255, 106, 42, .28); }
+  .nav-item:hover { color: var(--text); }
+  main { flex: 1; min-width: 0; padding: 22px 24px 60px; }
+
+  /* ---------- 概览 ---------- */
+  .page-head { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+  .page-head h2 { margin: 0; font-size: 17px; }
+  .page-head .spacer { flex: 1; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+  .stat { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; }
+  .stat .label { color: var(--muted); font-size: 12px; }
+  .stat .value { font-size: 26px; font-weight: 700; margin-top: 4px; letter-spacing: .4px; }
+  .stat .value.accent { color: var(--accent); }
+  .stat .value.green { color: var(--green); }
+  .stat .value.blue { color: var(--blue); }
+  .stat .value.gold { color: var(--gold); }
+
+  /* ---------- 列表 ---------- */
+  .toolbar { display: flex; align-items: center; gap: 9px; margin-bottom: 12px; flex-wrap: wrap; }
+  .toolbar input { width: 220px; }
+  .toolbar input.phone { width: 160px; }
+  .toolbar select { width: 140px; }
+  .toolbar .spacer { flex: 1; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; overflow: auto; }
+  table { width: 100%; border-collapse: collapse; min-width: 720px; }
+  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 500; font-size: 12px; background: var(--panel-2); position: sticky; top: 0; }
+  tbody tr:hover { background: rgba(255, 255, 255, .02); }
+  tr:last-child td { border-bottom: 0; }
+  td .actions { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tag { display: inline-block; padding: 1px 9px; border-radius: 999px; font-size: 12px; background: #25303D; color: var(--muted); white-space: nowrap; }
+  .tag.ok { background: rgba(47, 191, 143, .14); color: var(--green); }
+  .tag.wait { background: rgba(255, 106, 42, .14); color: var(--accent); }
+  .tag.gold { background: rgba(216, 176, 106, .14); color: var(--gold); }
+  .tag.bad { background: rgba(255, 122, 107, .14); color: var(--red); }
+  .empty { padding: 46px 20px; text-align: center; color: var(--muted); }
+  .empty.error { color: var(--red); }
+  .pager { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
+  .pager .spacer { flex: 1; }
+  .footer-note { padding: 10px 14px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
+  .footer-note b { color: var(--gold); }
+
+  /* ---------- 弹窗 ---------- */
+  .modal { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 20px; background: rgba(5, 8, 12, .72); }
+  .modal-card { width: 100%; max-width: 720px; max-height: 88vh; overflow: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 30px 90px rgba(0, 0, 0, .6); }
+  .modal-head { display: flex; align-items: center; gap: 10px; padding: 16px 20px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: var(--panel); }
+  .modal-head h3 { margin: 0; font-size: 15px; flex: 1; }
+  .modal-body { padding: 18px 20px 22px; }
+  .kv { width: 100%; border-collapse: collapse; }
+  .kv th, .kv td { min-width: 0; white-space: normal; padding: 7px 0; border-bottom: 1px dashed var(--line); }
+  .kv th { width: 120px; background: transparent; position: static; color: var(--muted); font-weight: 400; vertical-align: top; }
+  .section-title { margin: 18px 0 8px; font-size: 13px; color: var(--gold); }
+  .code { background: #0C1117; border: 1px solid var(--line); border-radius: 10px; padding: 12px; font-family: ui-monospace, Consolas, monospace; font-size: 12px; white-space: pre-wrap; word-break: break-all; max-height: 320px; overflow: auto; }
+  .timeline { list-style: none; margin: 0; padding: 0; }
+  .timeline li { padding: 7px 0 7px 16px; border-left: 2px solid var(--line); position: relative; }
+  .timeline li::before { content: ""; position: absolute; left: -5px; top: 13px; width: 8px; height: 8px; border-radius: 50%; background: var(--line); }
+  .timeline li.done::before { background: var(--green); }
+  .timeline .t { color: var(--muted); font-size: 12px; margin-left: 8px; }
+  .note { background: var(--panel-2); border: 1px solid var(--line); border-radius: 9px; padding: 9px 12px; margin-bottom: 8px; }
+  .note .t { color: var(--muted); font-size: 12px; }
+  .form { display: block; }
+  .form-err { color: var(--red); font-size: 12px; min-height: 20px; margin-top: 4px; }
+  .form-actions { display: flex; justify-content: flex-end; gap: 9px; margin-top: 8px; }
+  .modal-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
+
+  /* ---------- Toast ---------- */
+  #toast { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%) translateY(20px); background: #223041; color: var(--text); border: 1px solid var(--line); padding: 10px 18px; border-radius: 10px; font-size: 13px; opacity: 0; pointer-events: none; transition: .18s ease; z-index: 80; max-width: 80vw; }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  #toast.err { border-color: rgba(255, 122, 107, .5); color: #FFD4CE; }
+
+  @media (max-width: 820px) {
+    .layout { flex-direction: column; }
+    nav.side { width: auto; flex: none; display: flex; gap: 6px; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--line); padding: 10px 12px; }
+    .nav-item { width: auto; white-space: nowrap; margin: 0; }
+    main { padding: 16px; }
+    header { padding: 12px 16px; }
+    .who { display: none; }
+    .toolbar input { width: 150px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 登录 -->
+<div id="login" class="login-wrap">
+  <div class="login-card">
+    <div class="brand">
+      <div class="logo">🚗</div>
+      <div>
+        <h1>车管家 · 运营后台</h1>
+        <div class="sub">管理员登录 · 操作全程审计</div>
+      </div>
+    </div>
+    <form id="login-form" autocomplete="off">
+      <label class="field">
+        <span>用户名</span>
+        <input id="login-user" type="text" placeholder="请输入管理员用户名" autocomplete="username" />
+      </label>
+      <label class="field">
+        <span>密码</span>
+        <input id="login-pass" type="password" placeholder="请输入密码" autocomplete="current-password" />
+      </label>
+      <button id="login-btn" type="submit">登录</button>
+      <div id="login-error" class="login-error"></div>
+    </form>
+    <div class="login-hint">
+      管理员账号由平台配置（环境变量 CGJ_ADMIN_USER / CGJ_ADMIN_PASSWORD）。<br />
+      登录失败 5 次将锁定 15 分钟；所有后台操作均写入审计日志。
+    </div>
+  </div>
+</div>
+
+<!-- 后台 -->
+<div id="app" class="shell hidden">
+  <header>
+    <div class="logo">🚗</div>
+    <div>
+      <h1>车管家 · 运营后台</h1>
+      <div class="sub">订单 · 商家 · 发票 · 反馈 · 审计</div>
+    </div>
+    <div class="spacer"></div>
+    <div class="who">
+      <b id="who-name">—</b>
+      <div><span id="who-role" class="role-chip">—</span></div>
+    </div>
+    <button class="ghost mini" data-act="change-password">修改密码</button>
+    <button class="ghost mini" data-act="logout">退出</button>
+  </header>
+  <div class="layout">
+    <nav class="side" id="nav"></nav>
+    <main id="content"></main>
+  </div>
+</div>
+
+<!-- 弹窗 -->
+<div id="modal" class="modal hidden">
+  <div class="modal-card" role="dialog" aria-modal="true">
+    <div class="modal-head">
+      <h3 id="modal-title"></h3>
+      <button class="ghost mini" id="modal-x" type="button">关闭</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script nonce="__ADMIN_CSP_NONCE__">
+(function () {
+  'use strict'
+
+  /* ---------------- 常量与状态 ---------------- */
+  const TOKEN_KEY = 'cgj_admin_token'
+
+  const STATUS_ORDER = {
+    pending: ['待支付', 'wait'], waiting: ['待接单', 'wait'], serving: ['服务中', 'gold'],
+    review: ['待评价', 'gold'], done: ['已完成', 'ok'], canceled: ['已取消', '']
+  }
+  const STATUS_APP = { reviewing: ['待审核', 'wait'], approved: ['已通过', 'ok'], rejected: ['已驳回', 'bad'] }
+  const STATUS_INV = { issuing: ['待开具', 'wait'], issued: ['已开具', 'ok'] }
+  const STATUS_FB = { pending: ['待处理', 'wait'], processing: ['处理中', 'gold'], resolved: ['已解决', 'ok'] }
+  const ROLE_LABEL = { super: '超级管理员', ops: '运营', finance: '财务', support: '客服' }
+  const TIER_LABEL = { none: '未开通', normal: '普通', premium: '尊享', enterprise: '企业 VIP' }
+
+  const state = {
+    token: localStorage.getItem(TOKEN_KEY) || '',
+    user: null,
+    perms: [],
+    view: 'overview',
+    page: 1,
+    pageSize: 20,
+    filters: {},
+    rows: [],
+    loading: false,
+    error: ''
+  }
+
+  const $ = (sel) => document.querySelector(sel)
+
+  function esc(value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, (c) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]))
+  }
+
+  function money(n) {
+    const v = Number(n) || 0
+    return '¥' + v.toLocaleString('zh-CN', { maximumFractionDigits: 2 })
+  }
+
+  function num(n) {
+    return (Number(n) || 0).toLocaleString('zh-CN')
+  }
+
+  function tag(status, map) {
+    const entry = map[status] || [status || '—', '']
+    return '<span class="tag ' + esc(entry[1]) + '">' + esc(entry[0]) + '</span>'
+  }
+
+  function can(perm) {
+    return state.perms.includes('*') || state.perms.includes(perm)
+  }
+
+  /* ---------------- 弹窗 / Toast ---------------- */
+  const modal = $('#modal')
+  const modalTitle = $('#modal-title')
+  const modalBody = $('#modal-body')
+  let pendingResolve = null
+
+  function openModal(title, html) {
+    modalTitle.textContent = title
+    modalBody.innerHTML = html
+    modal.classList.remove('hidden')
+  }
+
+  function closeModal() {
+    modal.classList.add('hidden')
+    modalBody.replaceChildren()
+    if (pendingResolve) {
+      const resolve = pendingResolve
+      pendingResolve = null
+      resolve(null)
+    }
+  }
+
+  $('#modal-x').addEventListener('click', closeModal)
+  modal.addEventListener('click', (e) => { if (e.target === modal) closeModal() })
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !modal.classList.contains('hidden')) closeModal() })
+
+  let toastTimer = 0
+  function toast(message, isError) {
+    const el = $('#toast')
+    el.textContent = message
+    el.classList.toggle('err', !!isError)
+    el.classList.add('show')
+    clearTimeout(toastTimer)
+    toastTimer = setTimeout(() => el.classList.remove('show'), 3600)
+  }
+
+  /** 表单弹窗：返回 Promise<对象|null> */
+  function ask(title, fields) {
+    return new Promise((resolve) => {
+      pendingResolve = resolve
+      openModal(title, '')
+      const form = document.createElement('form')
+      form.className = 'form'
+      const inputs = {}
+      for (const f of fields) {
+        const label = document.createElement('label')
+        label.className = 'field'
+        const span = document.createElement('span')
+        span.textContent = f.label
+        label.appendChild(span)
+        let input
+        if (f.type === 'textarea') {
+          input = document.createElement('textarea')
+          input.rows = f.rows || 3
+        } else if (f.type === 'select') {
+          input = document.createElement('select')
+          for (const option of f.options || []) {
+            const op = document.createElement('option')
+            op.value = option[0]
+            op.textContent = option[1]
+            input.appendChild(op)
+          }
+        } else {
+          input = document.createElement('input')
+          input.type = f.type || 'text'
+        }
+        if (f.placeholder) input.placeholder = f.placeholder
+        if (f.value != null) input.value = f.value
+        if (f.maxlength) input.maxLength = f.maxlength
+        label.appendChild(input)
+        form.appendChild(label)
+        inputs[f.name] = input
+      }
+      const err = document.createElement('div')
+      err.className = 'form-err'
+      const actions = document.createElement('div')
+      actions.className = 'form-actions'
+      const cancel = document.createElement('button')
+      cancel.type = 'button'
+      cancel.className = 'ghost'
+      cancel.textContent = '取消'
+      const submit = document.createElement('button')
+      submit.type = 'submit'
+      submit.textContent = '确定'
+      actions.appendChild(cancel)
+      actions.appendChild(submit)
+      form.appendChild(err)
+      form.appendChild(actions)
+      modalBody.appendChild(form)
+
+      cancel.addEventListener('click', closeModal)
+      form.addEventListener('submit', (e) => {
+        e.preventDefault()
+        const values = {}
+        for (const f of fields) {
+          const raw = String(inputs[f.name].value || '').trim()
+          if (f.required && !raw) {
+            err.textContent = '请填写' + f.label
+            inputs[f.name].focus()
+            return
+          }
+          if (f.minLength && raw && raw.length < f.minLength) {
+            err.textContent = f.label + '至少 ' + f.minLength + ' 个字'
+            inputs[f.name].focus()
+            return
+          }
+          values[f.name] = raw
+        }
+        pendingResolve = null
+        closeModal()
+        resolve(values)
+      })
+      const first = fields.length ? inputs[fields[0].name] : null
+      if (first) first.focus()
+    })
+  }
+
+  function kv(pairs) {
+    const rows = pairs
+      .filter((p) => p && p[1] !== undefined && p[1] !== null && p[1] !== '')
+      .map((p) => '<tr><th>' + esc(p[0]) + '</th><td>' + (p[2] ? p[2] : esc(p[1])) + '</td></tr>')
+      .join('')
+    return '<table class="kv">' + rows + '</table>'
+  }
+
+  function jsonBlock(value) {
+    let text = ''
+    try { text = typeof value === 'string' ? value : JSON.stringify(value, null, 2) } catch (e) { text = String(value) }
+    return '<pre class="code">' + esc(text) + '</pre>'
+  }
+
+  /* ---------------- API ---------------- */
+  async function api(path, options) {
+    const opts = options || {}
+    const headers = {}
+    if (state.token) headers.Authorization = 'Bearer ' + state.token
+    if (opts.body !== undefined) headers['Content-Type'] = 'application/json'
+    let res
+    try {
+      res = await fetch(path, {
+        method: opts.method || 'GET',
+        headers,
+        body: opts.body === undefined ? undefined : JSON.stringify(opts.body)
+      })
+    } catch (e) {
+      throw new Error('网络异常，请检查后端服务')
+    }
+    let data = {}
+    try { data = await res.json() } catch (e) { data = {} }
+    if (res.status === 401) {
+      clearAuth()
+      // 登录接口的 401 表示账号密码错误，由登录表单自行提示
+      if (path !== '/api/admin/login') {
+        showLogin('登录已失效，请重新登录')
+        if (!opts.silent) toast(data.error && data.error.message ? data.error.message : '登录已失效，请重新登录', true)
+      }
+      throw new Error('unauthorized')
+    }
+    if (!res.ok) {
+      const message = data.error && data.error.message ? data.error.message : ('HTTP ' + res.status)
+      throw new Error(message)
+    }
+    return data
+  }
+
+  /* ---------------- 登录态 ---------------- */
+  function applyAuth(data) {
+    state.user = data.user
+    state.perms = data.permissions || []
+    $('#who-name').textContent = data.user.displayName || data.user.username
+    $('#who-role').textContent = ROLE_LABEL[data.user.role] || data.user.role
+    renderNav()
+  }
+
+  function clearAuth() {
+    state.token = ''
+    state.user = null
+    state.perms = []
+    localStorage.removeItem(TOKEN_KEY)
+  }
+
+  function showLogin(message) {
+    $('#app').classList.add('hidden')
+    $('#login').classList.remove('hidden')
+    $('#login-error').textContent = message || ''
+  }
+
+  function showApp() {
+    $('#login').classList.add('hidden')
+    $('#app').classList.remove('hidden')
+  }
+
+  /* ---------------- 导航 ---------------- */
+  const NAV = [
+    { view: 'overview', label: '概览', icon: '📊', perm: 'overview' },
+    { view: 'orders', label: '订单', icon: '🧾', perm: 'orders:read' },
+    { view: 'users', label: '用户', icon: '👤', perm: 'users:read' },
+    { view: 'applications', label: '商家申请', icon: '🏪', perm: 'applications:read' },
+    { view: 'invoices', label: '发票', icon: '🧮', perm: 'invoices:read' },
+    { view: 'feedbacks', label: '反馈', icon: '💬', perm: 'feedbacks:read' },
+    { view: 'audit', label: '审计日志', icon: '🔒', perm: 'audit:read' },
+    { view: 'operators', label: '账号管理', icon: '🛡️', perm: 'operators:manage' }
+  ]
+
+  function renderNav() {
+    const nav = $('#nav')
+    nav.innerHTML = NAV
+      .filter((item) => can(item.perm))
+      .map((item) => {
+        const cls = state.view === item.view ? 'nav-item on' : 'nav-item'
+        return '<button class="' + cls + '" data-act="view" data-view="' + esc(item.view) + '">' +
+          '<span>' + item.icon + '</span><span>' + esc(item.label) + '</span></button>'
+      })
+      .join('')
+  }
+
+  /* ---------------- 视图配置 ---------------- */
+  const VIEWS = {
+    orders: {
+      title: '订单运营',
+      endpoint: '/api/admin/orders',
+      perm: 'orders:read',
+      statuses: [['', '全部状态'], ['pending', '待支付'], ['waiting', '待接单'], ['serving', '服务中'], ['review', '待评价'], ['done', '已完成'], ['canceled', '已取消']],
+      searchPlaceholder: '订单号 / 商家 / 用户',
+      phoneSearch: true,
+      columns: [
+        { label: '订单号', render: (r) => '<span class="mono">' + esc(r.id) + '</span>' },
+        { label: '用户', render: (r) => esc(r.userName || '—') + '<div class="sub">' + esc(r.phone) + '</div>' },
+        { label: '服务', render: (r) => esc(r.title || r.merchant || '—') },
+        { label: '金额', render: (r) => money(r.amount) },
+        { label: '状态', render: (r) => tag(r.status, STATUS_ORDER) },
+        { label: '下单时间', render: (r) => esc(r.createTime) }
+      ],
+      footer: (data) => '筛选金额合计：<b>' + money(data.sumAmount) + '</b>',
+      actions: (r) => {
+        const list = [{ act: 'detail-order', label: '详情', id: r.id, user: r.userId }]
+        if (can('orders:cancel') && (r.status === 'pending' || r.status === 'waiting')) {
+          list.push({ act: 'order-cancel', label: '取消/退款', cls: 'danger', id: r.id, user: r.userId })
+        }
+        if (can('orders:notes')) list.push({ act: 'order-note', label: '备注', id: r.id, user: r.userId })
+        return list
+      }
+    },
+    users: {
+      title: '用户管理',
+      endpoint: '/api/admin/users',
+      perm: 'users:read',
+      statuses: [],
+      searchPlaceholder: '手机号 / 昵称 / 用户 ID',
+      columns: [
+        { label: '用户', render: (r) => esc(r.name || '—') + '<div class="sub mono">' + esc(r.id) + '</div>' },
+        { label: '手机号', render: (r) => esc(r.phone) },
+        { label: '会员', render: (r) => '<span class="tag ' + (r.memberTier !== 'none' ? 'gold' : '') + '">' + esc(TIER_LABEL[r.memberTier] || r.memberTier || '—') + '</span>' },
+        { label: '积分', render: (r) => num(r.points) },
+        { label: '订单数', render: (r) => num(r.orderCount) },
+        { label: '角色', render: (r) => (r.role === 'merchant' ? '商家' : '车主') },
+        { label: '最近活跃', render: (r) => esc(r.lastActive || '—') }
+      ],
+      actions: (r) => [{ act: 'detail-user', label: '详情', id: r.id }]
+    },
+    applications: {
+      title: '商家入驻审核',
+      endpoint: '/api/admin/applications',
+      perm: 'applications:read',
+      statuses: [['', '全部状态'], ['reviewing', '待审核'], ['approved', '已通过'], ['rejected', '已驳回']],
+      searchPlaceholder: '商家名称 / 手机号 / 申请 ID',
+      columns: [
+        { label: '申请', render: (r) => esc(r.name || '—') + '<div class="sub mono">' + esc(r.id) + '</div>' },
+        { label: '申请人', render: (r) => esc(r.userName || '—') + '<div class="sub">' + esc(r.phone) + '</div>' },
+        { label: '城市', render: (r) => esc(r.city || '—') },
+        { label: '类型', render: (r) => esc(r.type || '—') },
+        { label: '状态', render: (r) => tag(r.status, STATUS_APP) },
+        { label: '提交时间', render: (r) => esc(r.submitTime || '—') }
+      ],
+      actions: (r) => {
+        const list = [{ act: 'detail-app', label: '详情', id: r.id, user: r.userId }]
+        if (can('applications:review') && r.status === 'reviewing') {
+          list.push({ act: 'app-approve', label: '通过', id: r.id, user: r.userId })
+          list.push({ act: 'app-reject', label: '驳回', cls: 'danger', id: r.id, user: r.userId })
+        }
+        return list
+      }
+    },
+    invoices: {
+      title: '发票管理',
+      endpoint: '/api/admin/invoices',
+      perm: 'invoices:read',
+      statuses: [['', '全部状态'], ['issuing', '待开具'], ['issued', '已开具']],
+      searchPlaceholder: '发票 ID / 手机号 / 用户',
+      columns: [
+        { label: '发票', render: (r) => '<span class="mono">' + esc(r.id) + '</span>' },
+        { label: '用户', render: (r) => esc(r.userName || '—') + '<div class="sub">' + esc(r.phone) + '</div>' },
+        { label: '抬头', render: (r) => esc(r.title || '—') },
+        { label: '金额', render: (r) => money(r.amount) },
+        { label: '状态', render: (r) => tag(r.status, STATUS_INV) },
+        { label: '申请时间', render: (r) => esc(r.createTime || '—') }
+      ],
+      actions: (r) => {
+        const list = [{ act: 'detail-invoice', label: '详情', id: r.id, user: r.userId }]
+        if (can('invoices:issue') && r.status === 'issuing') {
+          list.push({ act: 'invoice-issue', label: '开具', id: r.id, user: r.userId })
+        }
+        return list
+      }
+    },
+    feedbacks: {
+      title: '用户反馈',
+      endpoint: '/api/admin/feedbacks',
+      perm: 'feedbacks:read',
+      statuses: [['', '全部状态'], ['pending', '待处理'], ['processing', '处理中'], ['resolved', '已解决']],
+      searchPlaceholder: '反馈 ID / 手机号 / 用户',
+      columns: [
+        { label: '反馈', render: (r) => '<span class="mono">' + esc(r.id) + '</span>' },
+        { label: '用户', render: (r) => esc(r.userName || '—') + '<div class="sub">' + esc(r.phone) + '</div>' },
+        { label: '类型', render: (r) => esc(r.type || '—') },
+        { label: '内容', render: (r) => '<span class="muted">' + esc(String(r.content || '').slice(0, 42) || '—') + '</span>' },
+        { label: '状态', render: (r) => tag(r.status, STATUS_FB) },
+        { label: '提交时间', render: (r) => esc(r.createTime || '—') }
+      ],
+      actions: (r) => {
+        const list = [{ act: 'detail-feedback', label: '详情', id: r.id, user: r.userId }]
+        if (can('feedbacks:handle')) {
+          if (r.status === 'pending') list.push({ act: 'feedback-processing', label: '受理', id: r.id, user: r.userId })
+          if (r.status === 'processing') list.push({ act: 'feedback-resolved', label: '标记已解决', id: r.id, user: r.userId })
+        }
+        return list
+      }
+    },
+    audit: {
+      title: '审计日志',
+      endpoint: '/api/admin/audit',
+      perm: 'audit:read',
+      statuses: [],
+      searchPlaceholder: '动作（如 order.cancel）',
+      extraFilters: 'audit',
+      columns: [
+        { label: '时间', render: (r) => esc(r.createdAt) },
+        { label: '操作人', render: (r) => esc(r.actor) + '<div class="sub">' + esc(ROLE_LABEL[r.role] || r.role || '—') + '</div>' },
+        { label: '动作', render: (r) => '<span class="mono">' + esc(r.action) + '</span>' },
+        { label: '对象', render: (r) => esc(r.targetType || '—') + (r.targetId ? '<div class="sub mono">' + esc(r.targetId) + '</div>' : '') },
+        { label: '详情', render: (r) => '<span class="muted">' + esc(String(r.detail || '').slice(0, 60) || '—') + '</span>' },
+        { label: 'IP', render: (r) => '<span class="mono">' + esc(r.ip || '—') + '</span>' }
+      ],
+      actions: (r) => [{ act: 'detail-audit', label: '查看', id: r.id }]
+    },
+    operators: {
+      title: '管理员账号',
+      endpoint: '/api/admin/operators',
+      perm: 'operators:manage',
+      statuses: [],
+      noPager: true,
+      columns: [
+        { label: '用户名', render: (r) => '<span class="mono">' + esc(r.username) + '</span>' },
+        { label: '显示名', render: (r) => esc(r.displayName || '—') },
+        { label: '角色', render: (r) => '<span class="tag gold">' + esc(ROLE_LABEL[r.role] || r.role) + '</span>' },
+        { label: '状态', render: (r) => (r.status === 'active' ? '<span class="tag ok">启用</span>' : '<span class="tag bad">停用</span>') },
+        { label: '最后登录', render: (r) => esc(r.lastLoginAt || '—') },
+        { label: '创建时间', render: (r) => esc(r.createdAt || '—') }
+      ],
+      actions: (r) => {
+        if (!can('operators:manage') || !state.user || r.id === state.user.id) return []
+        return [{
+          act: 'operator-toggle', label: r.status === 'active' ? '停用' : '启用',
+          cls: r.status === 'active' ? 'danger' : '', id: r.id
+        }]
+      }
+    }
+  }
+
+  /* ---------------- 列表渲染 ---------------- */
+  function currentFilters() {
+    if (!state.filters[state.view]) {
+      state.filters[state.view] = { status: '', keyword: '', phone: '', from: '', to: '' }
+    }
+    return state.filters[state.view]
+  }
+
+  function renderToolbar(def) {
+    const f = currentFilters()
+    let html = '<div class="toolbar">'
+    if (def.statuses && def.statuses.length) {
+      html += '<select id="f-status">' + def.statuses.map((s) =>
+        '<option value="' + esc(s[0]) + '"' + (f.status === s[0] ? ' selected' : '') + '>' + esc(s[1]) + '</option>'
+      ).join('') + '</select>'
+    }
+    html += '<input id="f-keyword" type="text" value="' + esc(f.keyword) + '" placeholder="' + esc(def.searchPlaceholder || '搜索') + '" />'
+    if (def.phoneSearch) {
+      html += '<input id="f-phone" class="phone" type="text" value="' + esc(f.phone) + '" placeholder="手机号" />'
+    }
+    if (def.extraFilters === 'audit') {
+      html += '<input id="f-from" type="date" value="' + esc(f.from) + '" title="开始日期" />'
+      html += '<input id="f-to" type="date" value="' + esc(f.to) + '" title="结束日期" />'
+    }
+    html += '<button data-act="search">查询</button>'
+    html += '<button class="ghost" data-act="reset-filters">重置</button>'
+    html += '<div class="spacer"></div>'
+    html += '<button class="ghost" data-act="refresh">刷新</button>'
+    if (state.view === 'operators') html += '<button data-act="operator-create">新建管理员</button>'
+    html += '</div>'
+    return html
+  }
+
+  function renderTable(def) {
+    if (state.loading) return '<div class="panel"><div class="empty">加载中…</div></div>'
+    if (state.error) return '<div class="panel"><div class="empty error">' + esc(state.error) + '</div></div>'
+    if (!state.rows.length) return '<div class="panel"><div class="empty">暂无数据</div></div>'
+
+    const head = def.columns.map((c) => '<th>' + esc(c.label) + '</th>').join('') + '<th>操作</th>'
+    const body = state.rows.map((row) => {
+      const cells = def.columns.map((c) => '<td>' + c.render(row) + '</td>').join('')
+      const actions = def.actions ? def.actions(row) : []
+      const actionHtml = actions.length
+        ? '<div class="actions">' + actions.map((a) =>
+          '<button class="mini ' + esc(a.cls || 'ghost') + '" data-act="' + esc(a.act) + '"' +
+          ' data-id="' + esc(a.id || '') + '" data-user="' + esc(a.user || '') + '">' + esc(a.label) + '</button>'
+        ).join('') + '</div>'
+        : '<span class="muted">—</span>'
+      return '<tr>' + cells + '<td>' + actionHtml + '</td></tr>'
+    }).join('')
+
+    const footer = def.footer ? '<div class="footer-note">' + def.footer(state.data || {}) + '</div>' : ''
+    const pager = def.noPager ? '' : renderPager()
+    return '<div class="panel"><table><thead><tr>' + head + '</tr></thead><tbody>' + body +
+      '</tbody></table>' + footer + pager + '</div>'
+  }
+
+  function renderPager() {
+    const total = Number((state.data && state.data.total) || 0)
+    const pageSize = Number((state.data && state.data.pageSize) || state.pageSize)
+    const pages = Math.max(1, Math.ceil(total / pageSize))
+    const page = Number((state.data && state.data.page) || state.page)
+    return '<div class="pager">' +
+      '<button class="ghost mini" data-act="page" data-page="prev"' + (page <= 1 ? ' disabled' : '') + '>上一页</button>' +
+      '<span>第 ' + page + ' / ' + pages + ' 页 · 共 ' + num(total) + ' 条</span>' +
+      '<div class="spacer"></div>' +
+      '<button class="ghost mini" data-act="page" data-page="next"' + (page >= pages ? ' disabled' : '') + '>下一页</button>' +
+      '</div>'
+  }
+
+  function renderOverview(data) {
+    const items = [
+      ['注册用户', num(data.users), 'blue'],
+      ['订单总数', num(data.orders), ''],
+      ['成交金额（GMV）', money(data.gmv), 'accent'],
+      ['商家数量', num(data.merchants), 'gold'],
+      ['待审核入驻', num(data.pendingApplications), 'green'],
+      ['今日订单', num(data.todayOrders), ''],
+      ['今日成交', money(data.todayGmv), 'accent'],
+      ['待开发票', num(data.pendingInvoices), 'gold'],
+      ['待处理反馈', num(data.pendingFeedbacks), 'green'],
+      ['启用管理员', num(data.activeAdmins), 'blue']
+    ]
+    const actions = can('data:reset') || state.perms.includes('*')
+      ? '<button class="danger mini" data-act="reset-data">重置演示数据</button>'
+      : ''
+    return '<div class="page-head"><h2>运营概览</h2><div class="spacer"></div>' + actions + '</div>' +
+      '<div class="stats">' + items.map(([label, value, cls]) =>
+        '<div class="stat"><div class="label">' + esc(label) + '</div><div class="value ' + cls + '">' + esc(value) + '</div></div>'
+      ).join('') + '</div>'
+  }
+
+  /* ---------------- 数据加载 ---------------- */
+  async function loadOverview() {
+    state.loading = true
+    state.error = ''
+    $('#content').innerHTML = '<div class="empty">加载中…</div>'
+    try {
+      const data = await api('/api/admin/overview')
+      state.data = data
+      $('#content').innerHTML = renderOverview(data)
+    } catch (e) {
+      state.error = e.message === 'unauthorized' ? '登录已失效' : e.message
+      $('#content').innerHTML = '<div class="panel"><div class="empty error">' + esc(state.error) + '</div></div>'
+    } finally {
+      state.loading = false
+    }
+  }
+
+  async function loadList() {
+    const def = VIEWS[state.view]
+    if (!def) return
+    const f = currentFilters()
+    const params = new URLSearchParams()
+    params.set('page', String(state.page))
+    params.set('pageSize', String(state.pageSize))
+    if (f.status) params.set('status', f.status)
+    if (f.keyword) params.set(def.extraFilters === 'audit' ? 'action' : 'keyword', f.keyword)
+    if (def.phoneSearch && f.phone) params.set('phone', f.phone)
+    if (def.extraFilters === 'audit') {
+      if (f.from) params.set('from', f.from)
+      if (f.to) params.set('to', f.to)
+    }
+
+    state.loading = true
+    state.error = ''
+    renderShell()
+    try {
+      const data = await api(def.endpoint + '?' + params.toString())
+      state.data = data
+      state.rows = data.items || []
+      state.loading = false
+      renderShell()
+    } catch (e) {
+      state.loading = false
+      state.rows = []
+      state.error = e.message === 'unauthorized' ? '登录已失效' : e.message
+      renderShell()
+    }
+  }
+
+  function renderShell() {
+    const def = VIEWS[state.view]
+    if (!def) return
+    const content = $('#content')
+    content.innerHTML =
+      '<div class="page-head"><h2>' + esc(def.title) + '</h2><div class="spacer"></div></div>' +
+      renderToolbar(def) + renderTable(def)
+  }
+
+  function loadView() {
+    if (state.view === 'overview') return loadOverview()
+    return loadList()
+  }
+
+  function switchView(view) {
+    if (!VIEWS[view] && view !== 'overview') return
+    state.view = view
+    state.page = 1
+    currentFilters()
+    renderNav()
+    loadView()
+  }
+
+  /* ---------------- 详情 ---------------- */
+  async function showOrderDetail(id, userId) {
+    try {
+      const data = await api('/api/admin/orders/' + encodeURIComponent(id) + '?userId=' + encodeURIComponent(userId))
+      const o = data.order || {}
+      let html = '<h4 class="section-title">订单信息</h4>' + kv([
+        ['订单号', o.id],
+        ['状态', tag(o.status, STATUS_ORDER), true],
+        ['用户', (o.userName || '—') + ' ' + (o.phone || '')],
+        ['金额', money(o.amount)],
+        ['商家', o.merchant],
+        ['车辆', o.car],
+        ['下单时间', o.createTime],
+        ['更新时间', o.updatedAt],
+        ['支付方式', o.payLabel],
+        ['取消原因', o.cancelReason]
+      ])
+      if (Array.isArray(o.timeline) && o.timeline.length) {
+        html += '<h4 class="section-title">订单时间线</h4><ul class="timeline">' +
+          o.timeline.map((t) => '<li class="' + (t.done ? 'done' : '') + '">' + esc(t.text || '') +
+            (t.time ? '<span class="t">' + esc(t.time) + '</span>' : '') + '</li>').join('') + '</ul>'
+      }
+      const notes = data.adminNotes || []
+      html += '<h4 class="section-title">内部备注（仅后台可见）</h4>'
+      html += notes.length
+        ? notes.map((n) => '<div class="note">' + esc(n.note) + '<div class="t">' + esc(n.actor) + ' · ' + esc(n.createdAt) + '</div></div>').join('')
+        : '<div class="muted">暂无备注</div>'
+
+      const actions = []
+      if (can('orders:cancel') && (o.status === 'pending' || o.status === 'waiting')) {
+        actions.push('order-cancel')
+      }
+      if (can('orders:notes')) actions.push('order-note')
+      if (actions.length) {
+        html += '<div class="modal-actions">' + actions.map((act) =>
+          '<button class="' + (act === 'order-cancel' ? 'danger' : 'ghost') + '" data-act="' + act + '"' +
+          ' data-id="' + esc(o.id) + '" data-user="' + esc(o.userId) + '">' +
+          (act === 'order-cancel' ? '取消订单 / 模拟退款' : '添加内部备注') + '</button>'
+        ).join('') + '</div>'
+      }
+      openModal('订单详情', html)
+    } catch (e) {
+      toast(e.message, true)
+    }
+  }
+
+  async function showUserDetail(id) {
+    try {
+      const data = await api('/api/admin/users/' + encodeURIComponent(id))
+      const u = data.user || {}
+      const s = data.stats || {}
+      let html = '<h4 class="section-title">用户信息</h4>' + kv([
+        ['用户 ID', u.id],
+        ['昵称', u.name],
+        ['手机号', u.phone],
+        ['会员', TIER_LABEL[u.memberTier] || u.memberTier],
+        ['会员到期', u.memberExpire],
+        ['积分', num(u.points)],
+        ['余额', money(u.balance)],
+        ['角色', u.role === 'merchant' ? '商家' : '车主'],
+        ['注册时间', u.createdAt],
+        ['最近活跃', u.lastActive],
+        ['登录方式', u.loginType],
+        ['数据版本', data.revision]
+      ])
+      html += '<h4 class="section-title">活跃统计</h4>' + kv([
+        ['订单数', num(s.orders)],
+        ['车辆数', num(s.cars)],
+        ['发票申请', num(s.invoices)],
+        ['反馈数', num(s.feedbacks)],
+        ['未读消息', num(s.unreadMessages)]
+      ])
+      const actions = []
+      if (can('users:reveal')) {
+        actions.push({ act: 'reveal-phone', label: '查看完整手机号', cls: 'ghost' })
+        actions.push({ act: 'export-user', label: '导出用户数据', cls: 'ghost' })
+        actions.push({ act: 'privacy-request', label: '登记导出/删除申请', cls: 'ghost' })
+      }
+      if (actions.length) {
+        html += '<div class="modal-actions">' + actions.map((a) =>
+          '<button class="' + a.cls + '" data-act="' + a.act + '" data-id="' + esc(u.id) + '">' + esc(a.label) + '</button>'
+        ).join('') + '</div>'
+      }
+      openModal('用户详情', html)
+    } catch (e) {
+      toast(e.message, true)
+    }
+  }
+
+  function showApplicationDetail(row) {
+    let html = '<h4 class="section-title">入驻申请</h4>' + kv([
+      ['申请 ID', row.id],
+      ['商家名称', row.name],
+      ['状态', tag(row.status, STATUS_APP), true],
+      ['申请人', (row.userName || '—') + ' ' + (row.phone || '')],
+      ['联系电话', row.phone],
+      ['城市', row.city],
+      ['经营类型', row.type],
+      ['套餐', row.tier],
+      ['营业时间', row.hours],
+      ['地址', row.address],
+      ['提交时间', row.submitTime],
+      ['审核时间', row.reviewTime],
+      ['驳回原因', row.reason],
+      ['商家 ID', row.merchantId]
+    ])
+    if (row.intro) html += '<h4 class="section-title">商家简介</h4><div class="note">' + esc(row.intro) + '</div>'
+    if (can('applications:review') && row.status === 'reviewing') {
+      html += '<div class="modal-actions">' +
+        '<button data-act="app-approve" data-id="' + esc(row.id) + '" data-user="' + esc(row.userId) + '">通过审核</button>' +
+        '<button class="danger" data-act="app-reject" data-id="' + esc(row.id) + '" data-user="' + esc(row.userId) + '">驳回申请</button>' +
+        '</div>'
+    }
+    openModal('入驻申请详情', html)
+  }
+
+  function showInvoiceDetail(row) {
+    openModal('发票详情', '<h4 class="section-title">发票申请</h4>' + kv([
+      ['发票 ID', row.id],
+      ['状态', tag(row.status, STATUS_INV), true],
+      ['用户', (row.userName || '—') + ' ' + (row.phone || '')],
+      ['抬头', row.title],
+      ['类型', row.type === 'company' ? '企业' : '个人'],
+      ['税号', row.taxNo],
+      ['邮箱', row.email],
+      ['金额', money(row.amount)],
+      ['关联订单', Array.isArray(row.orderIds) ? row.orderIds.join('、') : ''],
+      ['申请时间', row.createTime],
+      ['开具时间', row.issuedTime],
+      ['发票号', row.invoiceNo],
+      ['备注', row.remark]
+    ]))
+  }
+
+  function showFeedbackDetail(row) {
+    openModal('反馈详情', '<h4 class="section-title">用户反馈</h4>' + kv([
+      ['反馈 ID', row.id],
+      ['状态', tag(row.status, STATUS_FB), true],
+      ['用户', (row.userName || '—') + ' ' + (row.phone || '')],
+      ['类型', row.type],
+      ['联系方式', row.contact],
+      ['提交时间', row.createTime],
+      ['处理时间', row.replyTime],
+      ['处理人', row.handledBy]
+    ]) +
+      '<h4 class="section-title">反馈内容</h4><div class="note">' + esc(row.content || '—') + '</div>' +
+      (row.reply ? '<h4 class="section-title">客服回复</h4><div class="note">' + esc(row.reply) + '</div>' : ''))
+  }
+
+  function showAuditDetail(row) {
+    openModal('审计日志详情', kv([
+      ['时间', row.createdAt],
+      ['操作人', row.actor],
+      ['角色', ROLE_LABEL[row.role] || row.role],
+      ['动作', row.action],
+      ['对象类型', row.targetType],
+      ['对象 ID', row.targetId],
+      ['IP', row.ip]
+    ]) + '<h4 class="section-title">详情</h4>' + jsonBlock(row.detail || '（无）'))
+  }
+
+  function findRow(id) {
+    return state.rows.find((r) => String(r.id) === String(id))
+  }
+
+  /* ---------------- 业务操作 ---------------- */
+  async function actOrderCancel(id, userId) {
+    const values = await ask('取消订单 / 模拟退款', [
+      { name: 'reason', label: '取消原因（必填，至少 2 个字）', type: 'textarea', required: true, minLength: 2, maxlength: 200 }
+    ])
+    if (!values) return
+    try {
+      const data = await api('/api/admin/orders/' + encodeURIComponent(id) + '/cancel', {
+        method: 'POST', body: { userId, reason: values.reason }
+      })
+      toast(data.refunded ? '订单已取消，已模拟原路退款' : '订单已取消')
+      closeModal()
+      loadView()
+    } catch (e) { toast(e.message, true) }
+  }
+
+  async function actOrderNote(id, userId) {
+    const values = await ask('添加内部备注', [
+      { name: 'note', label: '备注内容（仅后台可见）', type: 'textarea', required: true, minLength: 2, maxlength: 500 }
+    ])
+    if (!values) return
+    try {
+      await api('/api/admin/orders/' + encodeURIComponent(id) + '/notes', {
+        method: 'POST', body: { userId, note: values.note }
+      })
+      toast('备注已添加')
+      closeModal()
+      loadView()
+    } catch (e) { toast(e.message, true) }
+  }
+
+  async function actApprove(id, userId) {
+    if (!confirm('确认通过该商家入驻申请？通过后将自动生成商家并升级申请人账号。')) return
+    try {
+      const data = await api('/api/admin/applications/' + encodeURIComponent(id) + '/approve', {
+        method: 'POST', body: { userId }
+      })
+      toast('已通过审核，商家 ID：' + data.merchantId)
+      closeModal()
+      loadView()
+    } catch (e) { toast(e.message, true) }
+  }
+
+  async function actReject(id, userId) {
+    const values = await ask('驳回入驻申请', [
+      { name: 'reason', label: '驳回原因（必填，至少 5 个字）', type: 'textarea', required: true, minLength: 5, maxlength: 300 }
+    ])
+    if (!values) return
+    try {
+      await api('/api/admin/applications/' + encodeURIComponent(id) + '/reject', {
+        method: 'POST', body: { userId, reason: values.reason }
+      })
+      toast('已驳回申请')
+      closeModal()
+      loadView()
+    } catch (e) { toast(e.message, true) }
+  }
+
+  async function actInvoiceIssue(id, userId) {
+    const values = await ask('开具发票', [
+      { name: 'invoiceNo', label: '发票号（可留空）', placeholder: '例如 FP202611020001', maxlength: 64 },
+      { name: 'remark', label: '备注（可留空）', type: 'textarea', maxlength: 200 }
+    ])
+    if (!values) return
+    try {
+      await api('/api/admin/invoices/' + encodeURIComponent(id) + '/issue', {
+        method: 'POST', body: { userId, invoiceNo: values.invoiceNo, remark: values.remark }
+      })
+      toast('发票已标记为已开具')
+      closeModal()
+      loadView()
+    } catch (e) { toast(e.message, true) }
+  }
+
+  async function actFeedback(id, userId, status) {
+    const values = await ask(status === 'resolved' ? '标记反馈已解决' : '受理反馈', [
+      { name: 'reply', label: '回复内容（可选，用户可见）', type: 'textarea', maxlength: 500 }
+    ])
+    if (!values) return
+    try {
+      await api('/api/admin/feedbacks/' + encodeURIComponent(id) + '/status', {
+        method: 'POST', body: { userId, status, reply: values.reply }
+      })
+      toast(status === 'resolved' ? '反馈已标记为已解决' : '反馈已受理')
+      closeModal()
+      loadView()
+    } catch (e) { toast(e.message, true) }
+  }
+
+  async function actRevealPhone(id) {
+    try {
+      const data = await api('/api/admin/users/' + encodeURIComponent(id) + '/reveal-phone', { method: 'POST' })
+      openModal('完整手机号', kv([['手机号', data.phone]]) +
+        '<div class="note muted">本次查看已写入审计日志（动作 user.phone.reveal）。</div>')
+    } catch (e) { toast(e.message, true) }
+  }
+
+  async function actExportUser(id) {
+    if (!confirm('导出该用户的完整数据？该操作会写入审计日志。')) return
+    try {
+      const data = await api('/api/admin/users/' + encodeURIComponent(id) + '/export')
+      openModal('用户数据导出', '<div class="note muted">导出时间：' + esc(data.exportedAt) + '，已写入审计日志。</div>' +
+        jsonBlock(data.state))
+    } catch (e) { toast(e.message, true) }
+  }
+
+  async function actPrivacyRequest(id) {
+    const values = await ask('登记用户数据申请', [
+      { name: 'type', label: '申请类型', type: 'select', options: [['export', '数据导出'], ['delete', '数据删除']] },
+      { name: 'reason', label: '申请说明 / 用户诉求', type: 'textarea', required: true, minLength: 2, maxlength: 300 }
+    ])
+    if (!values) return
+    try {
+      const data = await api('/api/admin/users/' + encodeURIComponent(id) + '/privacy-requests', {
+        method: 'POST', body: values
+      })
+      toast('申请已登记，编号 #' + data.requestId + '（需人工复核）')
+      closeModal()
+    } catch (e) { toast(e.message, true) }
+  }
+
+  async function actOperatorCreate() {
+    const values = await ask('新建管理员', [
+      { name: 'username', label: '用户名', required: true, placeholder: '3-32 位字母数字', maxlength: 32 },
+      { name: 'displayName', label: '显示名', maxlength: 40 },
+      { name: 'role', label: '角色', type: 'select', options: [['ops', '运营'], ['finance', '财务'], ['support', '客服'], ['super', '超级管理员']] },
+      { name: 'password', label: '初始密码（至少 8 位，含字母和数字）', type: 'password', required: true, minLength: 8, maxlength: 128 }
+    ])
+    if (!values) return
+    try {
+      await api('/api/admin/operators', { method: 'POST', body: values })
+      toast('管理员已创建')
+      loadView()
+    } catch (e) { toast(e.message, true) }
+  }
+
+  async function actOperatorToggle(id, username, status) {
+    const next = status === 'active' ? 'disabled' : 'active'
+    if (!confirm('确认' + (next === 'active' ? '启用' : '停用') + '账号 ' + username + '？')) return
+    try {
+      await api('/api/admin/operators/' + encodeURIComponent(id) + '/status', {
+        method: 'POST', body: { status: next }
+      })
+      toast('账号状态已更新')
+      loadView()
+    } catch (e) { toast(e.message, true) }
+  }
+
+  async function actResetData() {
+    if (!confirm('确定清空全部用户、订单、商家与申请数据吗？该操作不可恢复，并会写入审计日志。')) return
+    try {
+      await api('/api/admin/reset', { method: 'POST' })
+      toast('演示数据已重置')
+      loadView()
+    } catch (e) { toast(e.message, true) }
+  }
+
+  async function actChangePassword() {
+    const values = await ask('修改密码', [
+      { name: 'oldPassword', label: '原密码', type: 'password', required: true, maxlength: 128 },
+      { name: 'newPassword', label: '新密码（至少 8 位，含字母和数字）', type: 'password', required: true, minLength: 8, maxlength: 128 }
+    ])
+    if (!values) return
+    try {
+      await api('/api/admin/password', { method: 'POST', body: values })
+      toast('密码已修改，请重新登录')
+      clearAuth()
+      showLogin('密码已修改，请使用新密码重新登录')
+    } catch (e) { toast(e.message, true) }
+  }
+
+  async function actLogout() {
+    try { await api('/api/admin/logout', { method: 'POST', silent: true }) } catch (e) { /* ignore */ }
+    clearAuth()
+    showLogin('')
+  }
+
+  /* ---------------- 事件 ---------------- */
+  document.addEventListener('click', async (event) => {
+    const el = event.target.closest('[data-act]')
+    if (!el) return
+    const act = el.dataset.act
+    const id = el.dataset.id || ''
+    const user = el.dataset.user || ''
+
+    if (act === 'view') return switchView(el.dataset.view)
+    if (act === 'search') {
+      const f = currentFilters()
+      const statusEl = $('#f-status')
+      const keywordEl = $('#f-keyword')
+      const phoneEl = $('#f-phone')
+      const fromEl = $('#f-from')
+      const toEl = $('#f-to')
+      f.status = statusEl ? statusEl.value : ''
+      f.keyword = keywordEl ? keywordEl.value.trim() : ''
+      f.phone = phoneEl ? phoneEl.value.trim() : ''
+      f.from = fromEl ? fromEl.value : ''
+      f.to = toEl ? toEl.value : ''
+      state.page = 1
+      return loadView()
+    }
+    if (act === 'reset-filters') {
+      state.filters[state.view] = { status: '', keyword: '', phone: '', from: '', to: '' }
+      state.page = 1
+      return loadView()
+    }
+    if (act === 'refresh') return loadView()
+    if (act === 'page') {
+      const target = el.dataset.page
+      const total = Number((state.data && state.data.total) || 0)
+      const pageSize = Number((state.data && state.data.pageSize) || state.pageSize)
+      const pages = Math.max(1, Math.ceil(total / pageSize))
+      state.page = target === 'next' ? Math.min(pages, state.page + 1) : Math.max(1, state.page - 1)
+      return loadList()
+    }
+    if (act === 'logout') return actLogout()
+    if (act === 'change-password') return actChangePassword()
+    if (act === 'reset-data') return actResetData()
+
+    if (act === 'detail-order') return showOrderDetail(id, user)
+    if (act === 'order-cancel') return actOrderCancel(id, user)
+    if (act === 'order-note') return actOrderNote(id, user)
+    if (act === 'detail-user') return showUserDetail(id)
+    if (act === 'reveal-phone') return actRevealPhone(id)
+    if (act === 'export-user') return actExportUser(id)
+    if (act === 'privacy-request') return actPrivacyRequest(id)
+
+    if (act === 'detail-app') {
+      const row = findRow(id)
+      if (row) showApplicationDetail(row)
+      return
+    }
+    if (act === 'app-approve') return actApprove(id, user)
+    if (act === 'app-reject') return actReject(id, user)
+    if (act === 'detail-invoice') {
+      const row = findRow(id)
+      if (row) showInvoiceDetail(row)
+      return
+    }
+    if (act === 'invoice-issue') return actInvoiceIssue(id, user)
+    if (act === 'detail-feedback') {
+      const row = findRow(id)
+      if (row) showFeedbackDetail(row)
+      return
+    }
+    if (act === 'feedback-processing') return actFeedback(id, user, 'processing')
+    if (act === 'feedback-resolved') return actFeedback(id, user, 'resolved')
+    if (act === 'detail-audit') {
+      const row = findRow(id)
+      if (row) showAuditDetail(row)
+      return
+    }
+    if (act === 'operator-create') return actOperatorCreate()
+    if (act === 'operator-toggle') {
+      const row = findRow(id)
+      if (row) return actOperatorToggle(id, row.username, row.status)
+      return
+    }
+  })
+
+  $('#login-form').addEventListener('submit', async (event) => {
+    event.preventDefault()
+    const username = $('#login-user').value.trim()
+    const password = $('#login-pass').value
+    const err = $('#login-error')
+    err.textContent = ''
+    if (!username || !password) { err.textContent = '请输入用户名和密码'; return }
+    const btn = $('#login-btn')
+    btn.disabled = true
+    btn.textContent = '登录中…'
+    try {
+      const data = await api('/api/admin/login', { method: 'POST', body: { username, password }, silent: true })
+      state.token = data.token
+      localStorage.setItem(TOKEN_KEY, data.token)
+      applyAuth(data)
+      $('#login-pass').value = ''
+      showApp()
+      switchView('overview')
+    } catch (e) {
+      if (e.message !== 'unauthorized') err.textContent = e.message
+      else err.textContent = '用户名或密码不正确'
+    } finally {
+      btn.disabled = false
+      btn.textContent = '登录'
+    }
+  })
+
+  /* ---------------- 启动 ---------------- */
+  async function boot() {
+    if (!state.token) return showLogin('')
+    try {
+      const data = await api('/api/admin/session', { silent: true })
+      applyAuth(data)
+      showApp()
+      switchView('overview')
+    } catch (e) {
+      clearAuth()
+      showLogin('')
+    }
+  }
+
+  boot()
+})()
+</script>
+</body>
+</html>

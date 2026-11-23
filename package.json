@@ -1,0 +1,42 @@
+{
+  "name": "car-manager-app",
+  "version": "1.9.0",
+  "private": true,
+  "description": "车管家 - 全品类汽车综合服务平台",
+  "scripts": {
+    "dev:h5": "uni",
+    "dev:mp-weixin": "uni -p mp-weixin",
+    "build:h5": "uni build",
+    "build:mp-weixin": "uni build -p mp-weixin",
+    "server": "node server/index.mjs",
+    "test:server": "node server/test.mjs",
+    "test:admin": "node server/admin/test.mjs",
+    "test:nearby": "node tools/flow-nearby.mjs",
+    "test:booking-map": "node tools/flow-booking-map.mjs",
+    "test:invite": "node server/invite/test.mjs",
+    "test:invite-e2e": "node tools/flow-invite-qr.mjs",
+    "test:cloud": "node tools/cloud-e2e.mjs"
+  },
+  "dependencies": {
+    "@dcloudio/uni-app": "3.0.0-5030420261029002",
+    "@dcloudio/uni-components": "3.0.0-5030420261029002",
+    "@dcloudio/uni-h5": "3.0.0-5030420261029002",
+    "@dcloudio/uni-mp-weixin": "3.0.0-5030420261029002",
+    "vue": "^3.4.21"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  },
+  "devDependencies": {
+    "@dcloudio/types": "^3.4.8",
+    "@dcloudio/uni-cli-shared": "3.0.0-5030420261029002",
+    "@dcloudio/uni-stacktracey": "3.0.0-5030420261029002",
+    "@dcloudio/vite-plugin-uni": "3.0.0-5030420261029002",
+    "@vue/runtime-core": "^3.4.21",
+    "puppeteer-core": "^25.16.0",
+    "rollup": "4.14.3",
+    "vite": "5.2.8"
+  }
+}

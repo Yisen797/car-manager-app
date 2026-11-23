@@ -1,0 +1,175 @@
+{
+  "pages": [
+    {
+      "path": "pages/login/index",
+      "style": { "navigationBarTitleText": "登录", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/city/index",
+      "style": { "navigationBarTitleText": "选择城市", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/index/index",
+      "style": { "navigationBarTitleText": "车管家", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/service/index",
+      "style": { "navigationBarTitleText": "服务大全", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/rescue/index",
+      "style": { "navigationBarTitleText": "应急救援", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/orders/index",
+      "style": { "navigationBarTitleText": "我的订单", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/mine/index",
+      "style": { "navigationBarTitleText": "我的", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/member/index",
+      "style": { "navigationBarTitleText": "会员中心", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/member/pay",
+      "style": { "navigationBarTitleText": "确认支付", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/service/detail",
+      "style": { "navigationBarTitleText": "服务详情", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/booking/index",
+      "style": { "navigationBarTitleText": "预约服务", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/pay/index",
+      "style": { "navigationBarTitleText": "收银台", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/review/index",
+      "style": { "navigationBarTitleText": "服务评价", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/coupon/index",
+      "style": { "navigationBarTitleText": "我的优惠券", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/points/index",
+      "style": { "navigationBarTitleText": "积分商城", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/messages/index",
+      "style": { "navigationBarTitleText": "消息中心", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/profile/index",
+      "style": { "navigationBarTitleText": "编辑资料", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/settings/index",
+      "style": { "navigationBarTitleText": "设置", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/doc/index",
+      "style": { "navigationBarTitleText": "协议与说明", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/invoice/index",
+      "style": { "navigationBarTitleText": "发票中心", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/support/index",
+      "style": { "navigationBarTitleText": "客服中心", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/invite/index",
+      "style": { "navigationBarTitleText": "邀请有礼", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/enterprise/apply",
+      "style": { "navigationBarTitleText": "企业认证", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/merchant/login",
+      "style": { "navigationBarTitleText": "商家登录", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/merchant/apply",
+      "style": { "navigationBarTitleText": "入驻申请", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/merchant/center",
+      "style": { "navigationBarTitleText": "商家工作台", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/merchant/orders",
+      "style": { "navigationBarTitleText": "订单管理", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/merchant/shop",
+      "style": { "navigationBarTitleText": "店铺管理", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/merchant/mine",
+      "style": { "navigationBarTitleText": "商家中心", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/travel/index",
+      "style": { "navigationBarTitleText": "出行服务", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/travel/webview",
+      "style": { "navigationBarTitleText": "高德打车", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/rescue/create",
+      "style": { "navigationBarTitleText": "呼叫救援", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/order/detail",
+      "style": { "navigationBarTitleText": "订单详情", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/nearby/index",
+      "style": { "navigationBarTitleText": "附近门店", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/merchant/list",
+      "style": { "navigationBarTitleText": "附近商家", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/merchant/detail",
+      "style": { "navigationBarTitleText": "商家详情", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/merchant/join",
+      "style": { "navigationBarTitleText": "商家入驻", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/enterprise/index",
+      "style": { "navigationBarTitleText": "企业会员", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/car/list",
+      "style": { "navigationBarTitleText": "我的车辆", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/car/add",
+      "style": { "navigationBarTitleText": "添加车辆", "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/result/index",
+      "style": { "navigationBarTitleText": "提交成功", "navigationStyle": "custom" }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "车管家",
+    "navigationBarBackgroundColor": "#FFFFFF",
+    "backgroundColor": "#F4F5F7",
+    "navigationStyle": "custom"
+  }
+}

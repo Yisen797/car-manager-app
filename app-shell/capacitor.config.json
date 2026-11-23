@@ -1,0 +1,12 @@
+{
+  "appId": "com.cheguanjia.app",
+  "appName": "车管家",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "backgroundColor": "#F4F5F7",
+    "allowMixedContent": false
+  }
+}
